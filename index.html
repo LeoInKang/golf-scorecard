@@ -591,13 +591,13 @@ function buildTable(r){
     const idx=Array.from({length:e-s},(_,i)=>i+s);
     const ps=idx.reduce((a,i)=>a+r.pars[i],0);
     const ss=idx.reduce((a,i)=>a+(r.holes[i].score||0),0);
-    return`<tr><th class="rl">홀</th>${idx.map(i=>`<th class="hbtn" onclick="editHole(${i})">${i+1}</th>`).join('')}<th class="rl">합</th></tr>
-    <tr class="rpar"><td class="rl">파</td>${idx.map(i=>`<td>${r.pars[i]}</td>`).join('')}<td class="scell">${ps}</td></tr>
-    <tr class="rscore"><td class="rl">타</td>${idx.map(i=>{const sc=r.holes[i].score;if(!sc)return`<td>-</td>`;return`<td class="${scoreClass(sc,r.pars[i])}">${sc}</td>`;}).join('')}<td class="scell">${ss||'-'}</td></tr>`;
+    const sd=idx.reduce((a,i)=>{const sc=r.holes[i].score;return a+(sc?sc-r.pars[i]:0);},0);
+    return`<tr><th class="rl"></th>${idx.map(i=>`<th class="hbtn" onclick="editHole(${i})">${i+1}</th>`).join('')}<th class="rl"></th></tr>
+    <tr class="rscore"><td class="rl"></td>${idx.map(i=>{const sc=r.holes[i].score;if(!sc)return`<td>-</td>`;const d=sc-r.pars[i];return`<td class="${scoreClass(sc,r.pars[i])}">${d===0?'E':d>0?'+'+d:d}</td>`;}).join('')}<td class="scell">${sd===0?'E':sd>0?'+'+sd:sd}</td></tr>`;
   }
   const tp=r.pars.reduce((a,b)=>a+b,0);
   t.innerHTML=half(0,9)+`<tr><td colspan="11" style="padding:4px;border:none;"></td></tr>`+half(9,18)+
-    `<tr><td class="rl" colspan="10" style="text-align:right;padding-right:8px;">총합</td><td class="scell">${r.totalScore}(${scoreRel(r.totalScore,tp)})</td></tr>`;
+    `<tr><td class="rl" colspan="10" style="text-align:right;padding-right:8px;">합계</td><td class="scell">${scoreRel(r.totalScore,tp)}</td></tr>`;
 }
 function renderStats(){
   const r=rounds[editRoundIdx]; if(!r) return;
