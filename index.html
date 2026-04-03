@@ -136,6 +136,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .hole-cell .hc-score.bogey{color:#FAC775;}
 .hole-cell .hc-score.double{color:#F5A623;}
 .hole-cell .hc-score.triple{color:#E24B4A;}
+
+/* ── 설정/MyBag ── */
+.settings-body{padding:16px;display:flex;flex-direction:column;gap:16px;overflow-y:auto;flex:1;}
+.settings-section{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:14px;}
+.settings-section-title{font-size:13px;font-weight:500;color:var(--color-text-secondary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;}
+.club-tag-grid{display:flex;flex-wrap:wrap;gap:6px;}
+.club-tag{padding:5px 12px;border-radius:20px;font-size:13px;cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);}
+.club-tag.active{background:#1D9E75;color:white;border-color:#1D9E75;}
+.club-tag:active{opacity:0.7;}
+/* ── 라운드 정보 ── */
+.round-info-body{padding:14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;flex:1;}
+.info-group{display:flex;flex-direction:column;gap:5px;}
+.info-label{font-size:12px;color:var(--color-text-secondary);font-weight:500;}
+.info-input{padding:9px 11px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);font-size:14px;color:var(--color-text-primary);width:100%;}
+.info-textarea{padding:9px 11px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);font-size:14px;color:var(--color-text-primary);width:100%;resize:none;height:80px;font-family:inherit;}
+.companion-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.companion-tag{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;background:#E1F5EE;color:#0F6E56;font-size:13px;}
+.companion-tag button{background:none;border:none;color:#0F6E56;cursor:pointer;font-size:14px;padding:0;line-height:1;}
+.companion-add-row{display:flex;gap:6px;}
+.companion-add-row input{flex:1;padding:8px 10px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);font-size:14px;color:var(--color-text-primary);}
+.companion-add-row button{background:#1D9E75;color:white;border:none;padding:8px 14px;border-radius:var(--border-radius-md);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+/* ── 사진/동영상 ── */
+.media-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.media-slot{border:0.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-md);aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;background:var(--color-background-secondary);position:relative;overflow:hidden;}
+.media-slot img,.media-slot video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.media-slot .media-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.5);color:white;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;z-index:2;}
+.media-slot .media-hint{font-size:12px;color:var(--color-text-secondary);text-align:center;}
+.media-slot .media-icon{font-size:24px;}
+.media-file-input{display:none;}
+/* ── 홈 하단 아이콘 바 ── */
+.home-bottom-bar{display:flex;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);}
+.hbb-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0;cursor:pointer;border:none;background:none;gap:3px;color:var(--color-text-secondary);font-size:10px;}
+.hbb-btn.active{color:#1D9E75;}
+.hbb-icon{font-size:20px;line-height:1;}
 </style>
 </head>
 <body>
@@ -147,6 +181,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <button class="btn-primary" onclick="startNewRound()">새 라운드 시작</button>
   <div style="margin-top:8px;"><button class="btn-secondary" onclick="goHistory()">라운드 히스토리</button></div>
   <div style="margin-top:8px;"><div class="sec-label">최근 라운드</div><div class="round-list" id="recent-list"></div></div>
+  <div style="flex:1;"></div>
+  <div class="home-bottom-bar">
+    <button class="hbb-btn active" onclick="goHome()"><span class="hbb-icon">🏠</span>홈</button>
+    <button class="hbb-btn" onclick="goHistory()"><span class="hbb-icon">📋</span>히스토리</button>
+    <button class="hbb-btn" onclick="goSettings()"><span class="hbb-icon">⚙️</span>설정</button>
+  </div>
 </div>
 
 <!-- SETUP -->
@@ -212,6 +252,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <button class="back-btn" id="stats-back-btn">←</button>
     <h2 id="stats-title" style="flex:1;">라운드 결과</h2>
     <button class="edit-btn" onclick="enterEditMode()">수정</button>
+    <button class="edit-btn" onclick="openRoundInfo()" style="margin-left:4px;">정보</button>
   </div>
   <div class="stats-body">
     <div class="sec-label" style="margin-bottom:6px;">스코어카드 <span style="font-size:11px;font-weight:400;letter-spacing:0;">(홀 번호 탭 → 해당 홀 수정)</span></div>
@@ -228,6 +269,58 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div id="history" class="screen">
   <div class="header"><button class="back-btn" onclick="goHome()">←</button><h2>라운드 히스토리</h2></div>
   <div style="padding:16px;flex:1;background:#f2f2f7;"><div class="round-list" id="history-list"></div></div>
+
+<!-- ROUND INFO -->
+<div id="roundinfo" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="closeRoundInfo()">←</button>
+    <h2>라운드 정보</h2>
+    <button class="edit-btn" onclick="saveRoundInfo()" style="background:rgba(255,255,255,0.2);">저장</button>
+  </div>
+  <div class="round-info-body">
+    <div class="info-group">
+      <div class="info-label">동반자</div>
+      <div class="companion-add-row">
+        <input id="companion-input" placeholder="이름 입력 후 추가" onkeydown="if(event.key==='Enter')addCompanion()"/>
+        <button onclick="addCompanion()">+ 추가</button>
+      </div>
+      <div class="companion-tags" id="companion-tags"></div>
+    </div>
+    <div class="info-group">
+      <div class="info-label">라운드 후기</div>
+      <textarea class="info-textarea" id="round-review" placeholder="오늘 라운드는 어땠나요?"></textarea>
+    </div>
+    <div class="info-group">
+      <div class="info-label">사진 / 동영상 (최대 2개)</div>
+      <div class="media-grid">
+        <div class="media-slot" id="media-slot-0" onclick="triggerMedia(0)">
+          <div class="media-icon">📷</div>
+          <div class="media-hint">탭하여 추가</div>
+        </div>
+        <div class="media-slot" id="media-slot-1" onclick="triggerMedia(1)">
+          <div class="media-icon">📷</div>
+          <div class="media-hint">탭하여 추가</div>
+        </div>
+      </div>
+      <input type="file" class="media-file-input" id="media-file-0" accept="image/*,video/*" onchange="onMediaChange(0,this)"/>
+      <input type="file" class="media-file-input" id="media-file-1" accept="image/*,video/*" onchange="onMediaChange(1,this)"/>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS / MyBag -->
+<div id="settings" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <h2>설정</h2>
+  </div>
+  <div class="settings-body">
+    <div class="settings-section">
+      <div class="settings-section-title">My Bag — 내 클럽 설정</div>
+      <div class="club-tag-grid" id="mybag-grid"></div>
+      <div style="margin-top:10px;font-size:12px;color:var(--color-text-secondary);">체크한 클럽만 샷 입력에서 사용됩니다.</div>
+    </div>
+  </div>
 </div>
 
 </div>
@@ -322,6 +415,127 @@ function saveRounds(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(rounds));
 function scoreRel(score,par){ const d=score-par; return d===0?'E':(d>0?'+':'')+d; }
 
 // ── 렌더 ─────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════
+// MyBag
+// ═══════════════════════════════════════════════════
+const ALL_CLUBS=['드라이버','3W','5W','7W','2H','3H','4H','5H','2I','3I','4I','5I','6I','7I','8I','9I','PW','AW','GW','SW','LW','퍼터'];
+let myBag=JSON.parse(localStorage.getItem('golf_mybag')||'null');
+if(!myBag) myBag=['드라이버','3W','5W','3H','4I','5I','6I','7I','8I','9I','PW','GW','SW','LW','퍼터'];
+function saveMyBag(){ localStorage.setItem('golf_mybag', JSON.stringify(myBag)); }
+function getClubs(){ return myBag.length>0 ? myBag : ALL_CLUBS; }
+
+function goSettings(){
+  renderMyBag();
+  showOnly('settings');
+}
+function renderMyBag(){
+  const el=document.getElementById('mybag-grid');
+  el.innerHTML=ALL_CLUBS.map(c=>`
+    <div class="club-tag${myBag.includes(c)?' active':''}" onclick="toggleClub('${c}')">${c}</div>
+  `).join('');
+}
+function toggleClub(c){
+  if(myBag.includes(c)) myBag=myBag.filter(x=>x!==c);
+  else myBag.push(c);
+  // ALL_CLUBS 순서대로 정렬
+  myBag.sort((a,b)=>ALL_CLUBS.indexOf(a)-ALL_CLUBS.indexOf(b));
+  saveMyBag();
+  renderMyBag();
+}
+
+// ═══════════════════════════════════════════════════
+// Round Info (동반자/후기/미디어)
+// ═══════════════════════════════════════════════════
+let roundInfoIdx=-1; // 어느 라운드의 정보를 편집 중인지
+
+function openRoundInfo(){
+  roundInfoIdx=editRoundIdx;
+  const r=rounds[roundInfoIdx]||{};
+  // 동반자
+  const companions=r.companions||[];
+  document.getElementById('companion-input').value='';
+  renderCompanionTags(companions);
+  // 후기
+  document.getElementById('round-review').value=r.review||'';
+  // 미디어
+  renderMediaSlots(r.media||[]);
+  showOnly('roundinfo');
+}
+function closeRoundInfo(){ showOnly('stats'); renderStats(); }
+
+function renderCompanionTags(companions){
+  document.getElementById('companion-tags').innerHTML=companions.map((c,i)=>
+    `<div class="companion-tag">${c}<button onclick="removeCompanion(${i})">✕</button></div>`
+  ).join('');
+}
+function addCompanion(){
+  const inp=document.getElementById('companion-input');
+  const name=inp.value.trim();
+  if(!name) return;
+  if(!rounds[roundInfoIdx]) return;
+  const companions=rounds[roundInfoIdx].companions||[];
+  if(!companions.includes(name)){companions.push(name);rounds[roundInfoIdx].companions=companions;}
+  inp.value='';
+  renderCompanionTags(companions);
+  saveRounds();
+}
+function removeCompanion(i){
+  const companions=rounds[roundInfoIdx].companions||[];
+  companions.splice(i,1);
+  rounds[roundInfoIdx].companions=companions;
+  renderCompanionTags(companions);
+  saveRounds();
+}
+
+// 미디어
+function triggerMedia(slot){
+  document.getElementById('media-file-'+slot).click();
+}
+function onMediaChange(slot,input){
+  if(!input.files[0]) return;
+  const file=input.files[0];
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const media=rounds[roundInfoIdx].media||[null,null];
+    while(media.length<2) media.push(null);
+    media[slot]={type:file.type.startsWith('video')?'video':'image',data:e.target.result};
+    rounds[roundInfoIdx].media=media;
+    saveRounds();
+    renderMediaSlots(media);
+  };
+  reader.readAsDataURL(file);
+}
+function renderMediaSlots(media){
+  [0,1].forEach(i=>{
+    const slot=document.getElementById('media-slot-'+i);
+    const m=media&&media[i];
+    if(m){
+      slot.innerHTML=m.type==='video'
+        ?`<video src="${m.data}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" muted></video>
+          <button class="media-del" onclick="deleteMedia(${i},event)">✕</button>`
+        :`<img src="${m.data}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
+          <button class="media-del" onclick="deleteMedia(${i},event)">✕</button>`;
+    } else {
+      slot.innerHTML='<div class="media-icon">📷</div><div class="media-hint">탭하여 추가</div>';
+    }
+  });
+}
+function deleteMedia(slot,e){
+  e.stopPropagation();
+  const media=rounds[roundInfoIdx].media||[null,null];
+  media[slot]=null;
+  rounds[roundInfoIdx].media=media;
+  saveRounds();
+  renderMediaSlots(media);
+}
+function saveRoundInfo(){
+  if(!rounds[roundInfoIdx]) return closeRoundInfo();
+  rounds[roundInfoIdx].review=document.getElementById('round-review').value.trim();
+  saveRounds();
+  closeRoundInfo();
+}
+
 function renderRecent(){
   const el=document.getElementById('recent-list');
   if(!rounds.length){el.innerHTML='<div style="text-align:center;color:#aaa;font-size:14px;padding:20px;">아직 라운드 기록이 없어요</div>';return;}
@@ -445,7 +659,7 @@ function renderShots(){
   document.getElementById('shot-list').innerHTML=shots.map((s,i)=>`
     <div class="shot-row">
       <div class="shot-num">${i+1}</div>
-      <select class="s-sel" onchange="updateShot(${i},'club',this.value)">${CLUBS.map(c=>`<option${s.club===c?' selected':''}>${c}</option>`).join('')}</select>
+      <select class="s-sel" onchange="updateShot(${i},'club',this.value)">${getClubs().map(c=>`<option${s.club===c?' selected':''}>${c}</option>`).join('')}</select>
       <input class="s-inp" type="number" placeholder="거리(m)" value="${s.dist||''}" onchange="updateShot(${i},'dist',this.value)" min="0" max="500" inputmode="numeric">
       <select class="s-res ${resClass(s.result)}" id="rs-${i}" onchange="updateResult(${i},this.value)">${RESULTS.map(r=>`<option${s.result===r?' selected':''}>${r}</option>`).join('')}</select>
       <button class="s-del" onclick="deleteShot(${i})">✕</button>
@@ -636,6 +850,25 @@ function renderStats(){
   r.holes.forEach(h=>h.shots.forEach(s=>{ if(s.dist&&Number(s.dist)>0&&s.result!=='OB'){if(!cd[s.club])cd[s.club]=[];cd[s.club].push(Number(s.dist));} }));
   const ca=Object.entries(cd).map(([c,ds])=>({c,avg:Math.round(ds.reduce((a,b)=>a+b,0)/ds.length),cnt:ds.length})).sort((a,b)=>b.avg-a.avg);
   const md=ca.length?ca[0].avg:1;
+  // 라운드 정보 미리보기
+  const preview=document.getElementById('stats-info-preview');
+  const companions=r.companions||[];
+  const review=r.review||'';
+  const media=r.media||[];
+  if(companions.length||review||media.some(m=>m)){
+    let html2='<div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;display:flex;flex-direction:column;gap:6px;">';
+    if(companions.length) html2+=`<div style="font-size:12px;color:var(--color-text-secondary);">동반자: <span style="color:var(--color-text-primary);font-weight:500;">${companions.join(', ')}</span></div>`;
+    if(review) html2+=`<div style="font-size:12px;color:var(--color-text-primary);">"${review}"</div>`;
+    if(media.some(m=>m)){
+      html2+='<div style="display:flex;gap:6px;">';
+      media.forEach(m=>{ if(m) html2+=m.type==='video'
+        ?`<video src="${m.data}" style="width:60px;height:60px;border-radius:6px;object-fit:cover;" muted></video>`
+        :`<img src="${m.data}" style="width:60px;height:60px;border-radius:6px;object-fit:cover;"/>`; });
+      html2+='</div>';
+    }
+    html2+='</div>';
+    preview.innerHTML=html2; preview.style.display='block';
+  } else { preview.style.display='none'; }
   document.getElementById('club-stats').innerHTML=ca.length
     ?ca.map(c=>`<div class="club-row"><div class="club-name">${c.c}</div><div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(c.avg/md*100)}%"><span>${c.avg}m</span></div></div><div class="bar-cnt">${c.cnt}회</div></div>`).join('')
     :'<div style="color:#aaa;font-size:13px;text-align:center;padding:8px;">샷 거리 데이터 없음</div>';
