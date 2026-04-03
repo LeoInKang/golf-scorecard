@@ -19,13 +19,14 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f2f2f7;min-height:100vh;}
 #app{max-width:430px;margin:0 auto;min-height:100vh;background:#fff;}
 .screen{display:none;flex-direction:column;min-height:100vh;}
+#play{height:100vh;overflow:hidden;}
 .screen.active{display:flex;}
-.header{background:#1D9E75;color:white;padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;}
+.header{background:#1D9E75;color:white;padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .header h2{font-size:17px;font-weight:600;color:white;flex:1;}
 .back-btn{background:rgba(255,255,255,0.25);border:none;color:white;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .back-btn:active{background:rgba(255,255,255,0.45);}
 .edit-btn{background:rgba(255,255,255,0.25);border:none;color:white;padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;}
-.score-badge{background:rgba(255,255,255,0.25);padding:5px 14px;border-radius:20px;font-size:17px;font-weight:700;color:white;white-space:nowrap;}
+.score-badge{background:rgba(255,255,255,0.25);padding:6px 16px;border-radius:24px;font-size:40px;font-weight:700;color:white;white-space:nowrap;}
 .score-badge.over{background:rgba(228,75,74,0.6);}
 .score-badge.under{background:rgba(255,255,255,0.4);}
 #home{padding:24px 16px;gap:16px;background:#f2f2f7;}
@@ -65,20 +66,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.3);}
 .dot.done{background:rgba(255,255,255,0.9);}
 .dot.current{background:#FAC775;}
-.hole-info-bar{background:#085041;padding:10px 16px;display:grid;grid-template-columns:repeat(4,1fr);}
-.hib{text-align:center;color:white;}
+.hole-info-bar{background:#085041;padding:10px 14px;display:grid;grid-template-columns:1fr 1fr 2fr;flex-shrink:0;align-items:center;}
+.hib{text-align:center;color:white;display:flex;align-items:center;justify-content:center;}
 .hib .v{font-size:20px;font-weight:700;line-height:1.3;}
 .hib .l{display:none;}
 .hole-detail-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 16px;background:#fff;border-bottom:1px solid #eee;}
 .hd-group{display:flex;flex-direction:column;gap:4px;}
 .hd-label{font-size:12px;color:#888;}
 .hd-input{padding:8px 10px;border-radius:8px;border:1px solid #e0e0e0;background:#f9f9f9;font-size:15px;color:#1a1a1a;width:100%;}
-.play-body{padding:12px 16px;display:flex;flex-direction:column;gap:12px;flex:1;}
+.play-body{padding:12px 16px;display:flex;flex-direction:column;gap:12px;flex:1;overflow-y:auto;}
 .score-section{display:flex;align-items:center;gap:16px;justify-content:center;padding:8px 0;}
 .score-btn{width:48px;height:48px;border-radius:50%;border:1.5px solid #ddd;background:#fff;font-size:24px;cursor:pointer;color:#333;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,0.1);}
 .score-btn:active{background:#f0f0f0;}
 .score-display{text-align:center;}
-.score-num{font-size:52px;font-weight:700;color:#1a1a1a;line-height:1;}
+.score-num{font-size:40px;font-weight:700;color:var(--color-text-primary);line-height:1;}
 .score-name{font-size:14px;font-weight:600;margin-top:4px;}
 .score-name.under{color:#1D9E75;}.score-name.over{color:#E24B4A;}.score-name.even{color:#888;}
 .shot-list{display:flex;flex-direction:column;gap:6px;}
@@ -127,10 +128,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .bar-fill span{font-size:11px;color:white;font-weight:600;}
 .bar-cnt{font-size:11px;color:#888;width:40px;text-align:right;flex-shrink:0;}
 
-.hole-scroll-bar{background:#0F6E56;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-.hole-scroll-bar::-webkit-scrollbar{display:none;}
-.hole-cells{display:flex;flex-direction:row;min-width:max-content;}
-.hole-cell{display:flex;flex-direction:column;align-items:center;padding:6px 10px;min-width:40px;cursor:pointer;border-right:0.5px solid rgba(255,255,255,0.1);}
+.hole-scroll-bar{background:#0F6E56;padding:4px 6px;flex-shrink:0;}
+.hole-cells{display:grid;grid-template-columns:repeat(18,1fr);width:100%;}
+.hole-cell{display:flex;flex-direction:column;align-items:center;padding:3px 1px;cursor:pointer;border-right:0.5px solid rgba(255,255,255,0.1);}
 .hole-cell.current{background:rgba(255,255,255,0.18);}
 .hole-cell .hc-num{font-size:10px;color:rgba(255,255,255,0.6);font-weight:500;}
 .hole-cell .hc-score{font-size:12px;font-weight:700;color:white;min-height:16px;line-height:16px;}
@@ -181,6 +181,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .lightbox video{max-width:95vw;max-height:90vh;border-radius:6px;outline:none;}
 .lightbox-close{position:fixed;top:16px;right:16px;background:rgba(255,255,255,0.2);border:none;color:white;width:40px;height:40px;border-radius:50%;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1000;}
 .lightbox-close:active{background:rgba(255,255,255,0.4);}
+
+/* ── 확인 다이얼로그 ── */
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;align-items:flex-end;justify-content:center;}
+.confirm-overlay.open{display:flex;}
+.confirm-sheet{background:var(--color-background-primary);border-radius:16px 16px 0 0;width:100%;max-width:430px;padding:20px 16px 32px;display:flex;flex-direction:column;gap:12px;}
+.confirm-title{font-size:16px;font-weight:500;color:var(--color-text-primary);text-align:center;}
+.confirm-msg{font-size:13px;color:var(--color-text-secondary);text-align:center;line-height:1.5;}
+.confirm-actions{display:flex;flex-direction:row;gap:8px;margin-top:4px;}
+.confirm-btn-del{background:none;color:#E24B4A;border:1.5px solid #E24B4A;padding:14px;border-radius:12px;font-size:16px;font-weight:500;cursor:pointer;flex:1;}
+.confirm-btn-del:active{background:#fff0f0;}
+.confirm-btn-cancel{background:#1D9E75;color:white;border:none;padding:14px;border-radius:12px;font-size:16px;font-weight:500;cursor:pointer;flex:1;}
+.confirm-btn-cancel:active{background:#0F6E56;}
 </style>
 </head>
 <body>
@@ -221,19 +233,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="edit-mode-bar" id="edit-mode-bar" style="display:none;">✏️ 수정 모드</div>
   <div class="hole-scroll-bar"><div class="hole-cells" id="prog-dots"></div></div>
   <div class="hole-info-bar">
-    <div class="hib">
-      <div style="display:flex;align-items:baseline;gap:1px;">
-        <span id="hi-hole-num" style="font-size:40px;font-weight:700;color:white;line-height:1;">1</span>
-        <span style="font-size:27px;font-weight:700;color:white;line-height:1;">H</span>
-      </div>
-    </div>
-    <div class="hib">
-      <div style="display:flex;align-items:baseline;gap:2px;">
-        <span style="font-size:27px;font-weight:500;color:rgba(255,255,255,0.75);line-height:1;">PAR</span>
-        <span id="hi-par-num" style="font-size:40px;font-weight:700;color:white;line-height:1;">4</span>
-      </div>
-    </div>
-    <div class="hib"><div class="v" id="hi-dist">-</div></div>
+    <div class="hib"><div style="display:inline-flex;align-items:baseline;"><span id="hi-hole-num" style="font-size:40px;font-weight:700;color:white;line-height:1;">1</span><span style="font-size:27px;font-weight:700;color:white;line-height:1;">H</span></div></div>
+    <div class="hib"><div style="display:inline-flex;align-items:baseline;"><span style="font-size:27px;font-weight:500;color:rgba(255,255,255,0.75);line-height:1;">PAR</span><span id="hi-par-num" style="font-size:40px;font-weight:700;color:white;line-height:1;">4</span></div></div>
     <div class="hib"><div style="display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;" id="hi-score-dots">-</div></div>
   </div>
   <div class="hole-detail-row">
@@ -341,6 +342,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="settings-section-title">My Bag — 내 클럽 설정</div>
       <div class="club-tag-grid" id="mybag-grid"></div>
       <div style="margin-top:10px;font-size:12px;color:var(--color-text-secondary);">체크한 클럽만 샷 입력에서 사용됩니다.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-overlay" id="confirm-overlay" onclick="confirmCancel(event)">
+  <div class="confirm-sheet">
+    <div class="confirm-title" id="confirm-title">삭제하시겠습니까?</div>
+    <div class="confirm-msg" id="confirm-msg">이 작업은 되돌릴 수 없습니다.</div>
+    <div class="confirm-actions">
+      <button class="confirm-btn-del" id="confirm-ok-btn" onclick="confirmOk()">삭제</button>
+      <button class="confirm-btn-cancel" onclick="confirmCancel()" autofocus>취소</button>
     </div>
   </div>
 </div>
@@ -628,6 +641,24 @@ function closeLightbox(e){
   lb.classList.remove('open');
   document.body.style.overflow='';
 }
+
+// ── 확인 다이얼로그 ────────────────────────────────────────────
+let _confirmCallback = null;
+function showConfirm(title, msg, onOk){
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-msg').textContent = msg;
+  _confirmCallback = onOk;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function confirmOk(){
+  document.getElementById('confirm-overlay').classList.remove('open');
+  if(_confirmCallback) { _confirmCallback(); _confirmCallback=null; }
+}
+function confirmCancel(e){
+  if(e && e.target !== document.getElementById('confirm-overlay')) return;
+  document.getElementById('confirm-overlay').classList.remove('open');
+  _confirmCallback = null;
+}
 function renderRecent(){
   const el=document.getElementById('recent-list');
   if(!rounds.length){el.innerHTML='<div style="text-align:center;color:#aaa;font-size:14px;padding:20px;">아직 라운드 기록이 없어요</div>';return;}
@@ -714,7 +745,7 @@ function editHole(holeIdx){
 
 // ── 홀 입력 ──────────────────────────────────────
 function onHolePar(v){ curRound.pars[curHole]=parseInt(v); document.getElementById('hi-par-num').textContent=v; refreshFromShots(); }
-function onHoleDist(v){ holeData[curHole].dist=parseInt(v)||0; document.getElementById('hi-dist').textContent=v||'-'; }
+function onHoleDist(v){ holeData[curHole].dist=parseInt(v)||0;  }
 
 function updateTotalBadge(){
   const badge=document.getElementById('total-badge');
@@ -777,7 +808,7 @@ function renderPlay(){
   document.getElementById('play-course').textContent=curRound.course;
   document.getElementById('hi-hole-num').textContent=h+1;
   document.getElementById('hi-par-num').textContent=par;
-  document.getElementById('hi-dist').textContent=data.dist||'-';
+  
   renderHoleScoreDots(data.score, curRound.pars[curHole]);
   document.getElementById('hd-par').value=par;
   document.getElementById('hd-dist').value=data.dist||'';
@@ -801,8 +832,8 @@ function scoreRelShort(score,par){
   return (d>0?'+':'')+d;
 }
 function renderProgBar(currentHole){
-  const cells=Array.from({length:18},(_,i)=>{
-    const sc=holeData[i].score;
+  document.getElementById('prog-dots').innerHTML=Array.from({length:18},(_,i)=>{
+    const sc=i===currentHole?0:holeData[i].score;
     const par=curRound.pars[i];
     const rel=scoreRelShort(sc,par);
     const cls=relClass(sc,par);
@@ -811,16 +842,6 @@ function renderProgBar(currentHole){
       <div class="hc-score ${cls}">${rel}</div>
     </div>`;
   }).join('');
-  document.getElementById('prog-dots').innerHTML=cells;
-  // 현재 홀이 보이도록 스크롤
-  const bar=document.querySelector('.hole-scroll-bar');
-  const cell=document.querySelectorAll('.hole-cell')[currentHole];
-  if(bar&&cell){
-    const cellLeft=cell.offsetLeft;
-    const barW=bar.clientWidth;
-    const cellW=cell.clientWidth;
-    bar.scrollLeft=cellLeft-(barW/2)+(cellW/2);
-  }
 }
 function jumpToHole(i){ curHole=i; renderPlay(); }
 function renderHoleScoreDots(score,par){
@@ -908,8 +929,9 @@ function deleteRoundAt(idx,e){
   renderRecent(); renderHistoryList();
 }
 function deleteRound(){
-  if(!confirm('이 라운드를 삭제할까요?')) return;
-  rounds.splice(editRoundIdx,1); saveRounds(); goHome();
+  showConfirm('라운드를 삭제하시겠습니까?', '삭제한 데이터는 복구할 수 없습니다.', ()=>{
+    rounds.splice(editRoundIdx,1); saveRounds(); goHome();
+  });
 }
 
 // ── 통계 ─────────────────────────────────────────
