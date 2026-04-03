@@ -41,10 +41,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-danger:active{background:#fff0f0;}
 .sec-label{font-size:12px;color:#888;font-weight:600;margin-bottom:6px;letter-spacing:0.3px;}
 .round-list{display:flex;flex-direction:column;gap:8px;}
-.round-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:8px;overflow:hidden;}
+.round-card{background:var(--color-background-primary);border-radius:12px;border:1.5px solid #B4B2A9;display:flex;align-items:stretch;overflow:hidden;}
 .round-card-body{flex:1;cursor:pointer;padding:11px 13px;min-width:0;}
-.rc-del{background:none;border:none;border-left:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);font-size:16px;cursor:pointer;padding:0 14px;align-self:stretch;display:flex;align-items:center;}
-.rc-del:active{color:#E24B4A;background:#fff0f0;}
+.rc-del{background:var(--color-background-secondary);border:none;border-left:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);cursor:pointer;padding:0 16px;align-self:stretch;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rc-del:active{background:#fff0f0;color:#E24B4A;}
 .round-card:active{background:#f9f9f9;}
 .rc-top{display:flex;justify-content:space-between;align-items:center;}
 .rc-course{font-size:14px;font-weight:500;color:var(--color-text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -221,10 +221,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="edit-mode-bar" id="edit-mode-bar" style="display:none;">✏️ 수정 모드</div>
   <div class="hole-scroll-bar"><div class="hole-cells" id="prog-dots"></div></div>
   <div class="hole-info-bar">
-    <div class="hib"><div class="v" id="hi-hole">1H</div></div>
-    <div class="hib"><div class="v" id="hi-par">PAR4</div></div>
+    <div class="hib">
+      <div style="display:flex;align-items:baseline;gap:1px;">
+        <span id="hi-hole-num" style="font-size:40px;font-weight:700;color:white;line-height:1;">1</span>
+        <span style="font-size:27px;font-weight:700;color:white;line-height:1;">H</span>
+      </div>
+    </div>
+    <div class="hib">
+      <div style="display:flex;align-items:baseline;gap:2px;">
+        <span style="font-size:27px;font-weight:500;color:rgba(255,255,255,0.75);line-height:1;">PAR</span>
+        <span id="hi-par-num" style="font-size:40px;font-weight:700;color:white;line-height:1;">4</span>
+      </div>
+    </div>
     <div class="hib"><div class="v" id="hi-dist">-</div></div>
-    <div class="hib"><div class="v" style="font-size:13px;letter-spacing:1px;" id="hi-score-dots">-</div></div>
+    <div class="hib"><div style="display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;" id="hi-score-dots">-</div></div>
   </div>
   <div class="hole-detail-row">
     <div class="hd-group"><div class="hd-label">파</div>
@@ -629,7 +639,7 @@ function renderRecent(){
         <div class="rc-top"><div class="rc-course">${r.course}</div><div class="rc-score">${r.totalScore}<span style="font-size:12px;color:var(--color-text-secondary);font-weight:400;"> (${rel})</span></div></div>
         <div class="rc-date">${r.date}</div>
       </div>
-      <button class="rc-del" onclick="deleteRoundAt(${idx},event)">✕</button>
+      <button class="rc-del" onclick="deleteRoundAt(${idx},event)"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M6 4V2.5a.5.5 0 01.5-.5h3a.5.5 0 01.5.5V4M5 4l.5 9h5L11 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>`;
   }).join('');
 }
@@ -645,7 +655,7 @@ function renderHistoryList(){
         <div class="rc-top"><div class="rc-course">${r.course}</div><div class="rc-score">${r.totalScore}<span style="font-size:12px;color:var(--color-text-secondary);font-weight:400;"> (${rel})</span></div></div>
         <div class="rc-date">${r.date}</div>
       </div>
-      <button class="rc-del" onclick="deleteRoundAt(${idx2},event)">✕</button>
+      <button class="rc-del" onclick="deleteRoundAt(${idx2},event)"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M6 4V2.5a.5.5 0 01.5-.5h3a.5.5 0 01.5.5V4M5 4l.5 9h5L11 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>`;
   }).join('');
 }
@@ -703,7 +713,7 @@ function editHole(holeIdx){
 }
 
 // ── 홀 입력 ──────────────────────────────────────
-function onHolePar(v){ curRound.pars[curHole]=parseInt(v); document.getElementById('hi-par').textContent=v; refreshFromShots(); }
+function onHolePar(v){ curRound.pars[curHole]=parseInt(v); document.getElementById('hi-par-num').textContent=v; refreshFromShots(); }
 function onHoleDist(v){ holeData[curHole].dist=parseInt(v)||0; document.getElementById('hi-dist').textContent=v||'-'; }
 
 function updateTotalBadge(){
@@ -765,8 +775,8 @@ function changeScore(d){ holeData[curHole].score=Math.max(0,(holeData[curHole].s
 function renderPlay(){
   const h=curHole,par=curRound.pars[h],data=holeData[h];
   document.getElementById('play-course').textContent=curRound.course;
-  document.getElementById('hi-hole').textContent=(h+1)+'H';
-  document.getElementById('hi-par').textContent='PAR'+par;
+  document.getElementById('hi-hole-num').textContent=h+1;
+  document.getElementById('hi-par-num').textContent=par;
   document.getElementById('hi-dist').textContent=data.dist||'-';
   renderHoleScoreDots(data.score, curRound.pars[curHole]);
   document.getElementById('hd-par').value=par;
@@ -815,15 +825,43 @@ function renderProgBar(currentHole){
 function jumpToHole(i){ curHole=i; renderPlay(); }
 function renderHoleScoreDots(score,par){
   const el=document.getElementById('hi-score-dots');
-  if(!score){el.textContent='-';el.style.color='rgba(255,255,255,0.6)';return;}
+  if(!score){el.innerHTML='<span style="color:rgba(255,255,255,0.4);font-size:20px;">-</span>';return;}
   const max=score<=par?par:score;
-  const dots=Array.from({length:max},(_,i)=>{
-    const n=i+1;
-    return n===score?`[${n}]`:`${n}`;
-  }).join(' ');
-  el.textContent=dots;
   const d=score-par;
-  el.style.color=d<0?'#9FE1CB':d>0?'#FAC775':'white';
+  // 색상 팔레트
+  const colors={
+    eagle:'#9FE1CB', birdie:'#5DCAA5', par:'rgba(255,255,255,0.9)',
+    bogey:'#FAC775', double:'#F5A623', triple:'#E24B4A', worse:'#C0392B'
+  };
+  const dotColor = d<=-2?colors.eagle : d===-1?colors.birdie : d===0?colors.par :
+                   d===1?colors.bogey : d===2?colors.double : d===3?colors.triple : colors.worse;
+
+  el.innerHTML = Array.from({length:max},(_,i)=>{
+    const n=i+1;
+    const isCurrent = n===score;
+    if(isCurrent){
+      // 현재 스코어: 크고 채워진 원
+      return `<span style="
+        display:inline-flex;align-items:center;justify-content:center;
+        width:28px;height:28px;border-radius:50%;
+        background:${dotColor};
+        color:${d===0?'#085041':'#085041'};
+        font-size:14px;font-weight:700;
+        box-shadow:0 0 0 2px rgba(255,255,255,0.5);
+        margin:0 2px;vertical-align:middle;
+      ">${n}</span>`;
+    } else {
+      // 나머지: 작은 빈 원
+      return `<span style="
+        display:inline-flex;align-items:center;justify-content:center;
+        width:18px;height:18px;border-radius:50%;
+        border:1.5px solid rgba(255,255,255,0.35);
+        color:rgba(255,255,255,0.5);
+        font-size:10px;font-weight:500;
+        margin:0 1px;vertical-align:middle;
+      ">${n}</span>`;
+    }
+  }).join('');
 }
 function prevHole(){ if(curHole>0){curHole--;renderPlay();} }
 function nextHole(){ if(curHole<17){curHole++;renderPlay();}else{ isEditMode?saveEdit():finishRound(); } }
