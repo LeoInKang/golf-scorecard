@@ -376,12 +376,11 @@ let curRound=null,curHole=0,holeData=[];
 let isEditMode=false,editRoundIdx=-1;
 
 // stats 뒤로가기 목적지를 DOM data 속성으로 저장 → JS 변수 초기화 문제 원천 차단
-function function setStatsBackTarget(target){
+function setStatsBackTarget(target){
   document.getElementById('stats').dataset.backTo = target;
 }
 function getStatsBackTarget(){
   return document.getElementById('stats').dataset.backTo || 'home';
-};
 }
 
 // ── 화면 전환 ─────────────────────────────────────
