@@ -173,6 +173,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .hbb-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0;cursor:pointer;border:none;background:none;gap:3px;color:var(--color-text-secondary);font-size:10px;}
 .hbb-btn.active{color:#1D9E75;}
 .hbb-icon{font-size:20px;line-height:1;}
+
+/* ── 라이트박스 ── */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:999;align-items:center;justify-content:center;}
+.lightbox.open{display:flex;}
+.lightbox img{max-width:95vw;max-height:90vh;object-fit:contain;border-radius:6px;}
+.lightbox video{max-width:95vw;max-height:90vh;border-radius:6px;outline:none;}
+.lightbox-close{position:fixed;top:16px;right:16px;background:rgba(255,255,255,0.2);border:none;color:white;width:40px;height:40px;border-radius:50%;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1000;}
+.lightbox-close:active{background:rgba(255,255,255,0.4);}
 </style>
 </head>
 <body>
@@ -297,11 +305,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="info-group">
       <div class="info-label">사진 / 동영상 (최대 2개)</div>
       <div class="media-grid">
-        <div class="media-slot" id="media-slot-0" onclick="triggerMedia(0)">
+        <div class="media-slot" id="media-slot-0">
           <div class="media-icon">📷</div>
           <div class="media-hint">탭하여 추가</div>
         </div>
-        <div class="media-slot" id="media-slot-1" onclick="triggerMedia(1)">
+        <div class="media-slot" id="media-slot-1">
           <div class="media-icon">📷</div>
           <div class="media-hint">탭하여 추가</div>
         </div>
@@ -325,6 +333,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div style="margin-top:10px;font-size:12px;color:var(--color-text-secondary);">체크한 클럽만 샷 입력에서 사용됩니다.</div>
     </div>
   </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightbox-img" src="" style="display:none;"/>
+  <video id="lightbox-video" src="" controls playsinline style="display:none;"></video>
 </div>
 
 </div>
@@ -490,33 +505,72 @@ function removeCompanion(i){
 
 // 미디어
 function triggerMedia(slot){
+  // 이미 미디어가 있으면 클릭 무시 (삭제 버튼으로만 삭제)
+  const media=(rounds[roundInfoIdx]||{}).media||[];
+  if(media[slot]) return;
   document.getElementById('media-file-'+slot).click();
 }
 function onMediaChange(slot,input){
   if(!input.files[0]) return;
   const file=input.files[0];
-  const reader=new FileReader();
-  reader.onload=function(e){
+  const isVideo=file.type.startsWith('video');
+  if(isVideo){
+    // 동영상: ObjectURL로 처리 (base64 저장 안 함 - 세션 내 미리보기만)
+    const url=URL.createObjectURL(file);
     const media=rounds[roundInfoIdx].media||[null,null];
     while(media.length<2) media.push(null);
-    media[slot]={type:file.type.startsWith('video')?'video':'image',data:e.target.result};
+    media[slot]={type:'video',data:url,isObjectUrl:true};
     rounds[roundInfoIdx].media=media;
-    saveRounds();
+    renderMediaSlots(media);
+    // 동영상은 용량 때문에 localStorage 저장 생략 (세션 내만 유지)
+    return;
+  }
+  // 이미지: canvas로 리사이즈 후 저장
+  const img=new Image();
+  img.onload=function(){
+    const MAX=800;
+    let w=img.width, h=img.height;
+    if(w>MAX||h>MAX){
+      if(w>h){h=Math.round(h*MAX/w);w=MAX;}
+      else{w=Math.round(w*MAX/h);h=MAX;}
+    }
+    const canvas=document.createElement('canvas');
+    canvas.width=w; canvas.height=h;
+    canvas.getContext('2d').drawImage(img,0,0,w,h);
+    const data=canvas.toDataURL('image/jpeg',0.7);
+    const media=rounds[roundInfoIdx].media||[null,null];
+    while(media.length<2) media.push(null);
+    media[slot]={type:'image',data};
+    rounds[roundInfoIdx].media=media;
+    try{ saveRounds(); }catch(e){ console.warn('미디어 저장 실패(용량 초과):',e); }
     renderMediaSlots(media);
   };
+  const reader=new FileReader();
+  reader.onload=e=>{ img.src=e.target.result; };
   reader.readAsDataURL(file);
+  // input 초기화 (같은 파일 재선택 가능하도록)
+  input.value='';
 }
 function renderMediaSlots(media){
   [0,1].forEach(i=>{
     const slot=document.getElementById('media-slot-'+i);
     const m=media&&media[i];
     if(m){
+      // 미디어 있을 때: 클릭하면 라이트박스로 원본 보기
+      slot.onclick=(e)=>{ if(!e.target.classList.contains('media-del')) openLightbox(m); };
+      slot.style.cursor='zoom-in';
       slot.innerHTML=m.type==='video'
-        ?`<video src="${m.data}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" muted></video>
+        ?`<video src="${m.data}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:var(--border-radius-md);" muted playsinline></video>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+            <div style="background:rgba(0,0,0,0.45);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:18px;">▶</div>
+          </div>
           <button class="media-del" onclick="deleteMedia(${i},event)">✕</button>`
-        :`<img src="${m.data}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
+        :`<img src="${m.data}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:var(--border-radius-md);pointer-events:none;"/>
           <button class="media-del" onclick="deleteMedia(${i},event)">✕</button>`;
     } else {
+      // 미디어 없을 때: 클릭하면 파일 선택
+      slot.onclick=()=>triggerMedia(i);
+      slot.style.cursor='pointer';
       slot.innerHTML='<div class="media-icon">📷</div><div class="media-hint">탭하여 추가</div>';
     }
   });
@@ -536,6 +590,34 @@ function saveRoundInfo(){
   closeRoundInfo();
 }
 
+
+// ── 라이트박스 ──────────────────────────────────────────────────
+function openLightbox(m){
+  const lb=document.getElementById('lightbox');
+  const img=document.getElementById('lightbox-img');
+  const vid=document.getElementById('lightbox-video');
+  if(m.type==='video'){
+    img.style.display='none';
+    vid.src=m.data;
+    vid.style.display='block';
+    vid.play().catch(()=>{});
+  } else {
+    vid.pause(); vid.src='';
+    vid.style.display='none';
+    img.src=m.data;
+    img.style.display='block';
+  }
+  lb.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeLightbox(e){
+  if(e && e.target!==document.getElementById('lightbox') && !e.target.classList.contains('lightbox-close')) return;
+  const lb=document.getElementById('lightbox');
+  const vid=document.getElementById('lightbox-video');
+  vid.pause(); vid.src='';
+  lb.classList.remove('open');
+  document.body.style.overflow='';
+}
 function renderRecent(){
   const el=document.getElementById('recent-list');
   if(!rounds.length){el.innerHTML='<div style="text-align:center;color:#aaa;font-size:14px;padding:20px;">아직 라운드 기록이 없어요</div>';return;}
