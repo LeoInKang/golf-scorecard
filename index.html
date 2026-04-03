@@ -659,6 +659,13 @@ function confirmCancel(e){
   document.getElementById('confirm-overlay').classList.remove('open');
   _confirmCallback = null;
 }
+function deleteRoundAt(idx,e){
+  if(e) e.stopPropagation();
+  showConfirm('라운드를 삭제하시겠습니까?', '삭제한 데이터는 복구할 수 없습니다.', ()=>{
+    rounds.splice(idx,1); saveRounds();
+    renderRecent(); renderHistoryList();
+  });
+}
 function renderRecent(){
   const el=document.getElementById('recent-list');
   if(!rounds.length){el.innerHTML='<div style="text-align:center;color:#aaa;font-size:14px;padding:20px;">아직 라운드 기록이 없어요</div>';return;}
@@ -922,11 +929,6 @@ function saveEdit(){
   isEditMode=false;
   showOnly('stats'); renderStats();
   // stats back target은 수정 전 그대로 유지
-}
-function deleteRoundAt(idx,e){
-  if(e) e.stopPropagation();
-  rounds.splice(idx,1); saveRounds();
-  renderRecent(); renderHistoryList();
 }
 function deleteRound(){
   showConfirm('라운드를 삭제하시겠습니까?', '삭제한 데이터는 복구할 수 없습니다.', ()=>{
