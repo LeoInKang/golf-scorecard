@@ -203,7 +203,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- PLAY -->
 <div id="play" class="screen">
   <div class="header">
-    <button class="back-btn" id="play-back-btn">←</button>
+    <button class="back-btn" onclick="playBack()">←</button>
     <h2 id="play-course" style="flex:1;">홀 입력</h2>
     <span class="score-badge" id="total-badge">E</span>
   </div>
@@ -249,7 +249,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- STATS -->
 <div id="stats" class="screen">
   <div class="header">
-    <button class="back-btn" id="stats-back-btn">←</button>
+    <button class="back-btn" onclick="statsBack()">←</button>
     <h2 id="stats-title" style="flex:1;">라운드 결과</h2>
     <button class="edit-btn" onclick="enterEditMode()">수정</button>
     <button class="edit-btn" onclick="openRoundInfo()" style="margin-left:4px;">정보</button>
@@ -269,6 +269,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div id="history" class="screen">
   <div class="header"><button class="back-btn" onclick="goHome()">←</button><h2>라운드 히스토리</h2></div>
   <div style="padding:16px;flex:1;background:#f2f2f7;"><div class="round-list" id="history-list"></div></div>
+</div>
 
 <!-- ROUND INFO -->
 <div id="roundinfo" class="screen">
@@ -375,14 +376,25 @@ let curRound=null,curHole=0,holeData=[];
 let isEditMode=false,editRoundIdx=-1;
 
 // stats 뒤로가기 목적지를 DOM data 속성으로 저장 → JS 변수 초기화 문제 원천 차단
-function setStatsBackTarget(target){
-  document.getElementById('stats-back-btn').dataset.target = target;
+function function setStatsBackTarget(target){
+  document.getElementById('stats').dataset.backTo = target;
 }
 function getStatsBackTarget(){
-  return document.getElementById('stats-back-btn').dataset.target || 'home';
+  return document.getElementById('stats').dataset.backTo || 'home';
+};
 }
 
 // ── 화면 전환 ─────────────────────────────────────
+function playBack(){
+  if(isEditMode){ isEditMode=false; showOnly('stats'); renderStats(); }
+  else { showOnly('home'); renderRecent(); }
+}
+function cancelEdit(){ isEditMode=false; showOnly('stats'); renderStats(); }
+function statsBack(){
+  const target = getStatsBackTarget();
+  if(target === 'history') goHistory();
+  else goHome();
+}
 function showOnly(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -391,24 +403,10 @@ function goHome(){ showOnly('home'); renderRecent(); }
 function goHistory(){ showOnly('history'); renderHistoryList(); }
 
 // play 뒤로가기
-document.getElementById('play-back-btn').addEventListener('click', function(){
-  if(isEditMode){
-    if(confirm('수정을 취소할까요? 변경사항이 저장되지 않습니다.')){
-      isEditMode=false;
-      showOnly('stats');
-      renderStats();
-    }
-  } else {
-    if(confirm('라운드를 중단할까요?')) goHome();
-  }
-});
+// play back handled by onclick
 
 // stats 뒤로가기 — DOM dataset 기반
-document.getElementById('stats-back-btn').addEventListener('click', function(){
-  const target = getStatsBackTarget();
-  if(target === 'history') goHistory();
-  else goHome();
-});
+// stats back handled by onclick
 
 // ── 저장 ─────────────────────────────────────────
 function saveRounds(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(rounds)); }
